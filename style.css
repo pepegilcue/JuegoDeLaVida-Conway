@@ -1,0 +1,397 @@
+/* ============================================================
+   JUEGO DE LA VIDA - style.css
+
+   ÍNDICE
+   1. Variables de color
+   2. Estilos base
+   3. Cabecera
+   4. Estructura de la página
+   5. Tarjetas
+   6. Estadísticas
+   7. Lienzo
+   8. Botones
+   9. Formularios (select, sliders, checks)
+   10. Chips (reglas y patrones)
+   11. Textos y detalles
+   12. Adaptación a móvil
+   ============================================================ */
+
+
+/* ============================================================
+   1. VARIABLES DE COLOR
+   Aquí se cambian todos los colores de la web
+   ============================================================ */
+
+/* Tema claro (el que se usa por defecto) */
+:root {
+  --bg: #f2f5fb;                       /* fondo de la página */
+  --fg: #14181f;                       /* color del texto */
+  --muted: #5d6678;                    /* texto secundario */
+  --card: rgba(255, 255, 255, 0.8);    /* fondo de las tarjetas */
+  --borde: rgba(20, 24, 31, 0.12);     /* color de los bordes */
+  --a1: #0d9488;                       /* color de acento 1 (turquesa) */
+  --a2: #7c3aed;                       /* color de acento 2 (violeta) */
+  --lienzo: #ffffff;                   /* fondo de la cuadrícula */
+  --rejilla: #e3e7ef;                  /* líneas de la cuadrícula */
+  --viva: #0d9488;                     /* color de las células vivas */
+  --chipoff: rgba(20, 24, 31, 0.06);   /* botones sin seleccionar */
+}
+
+/* Tema oscuro (se activa solo si el sistema está en modo oscuro) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #090c14;
+    --fg: #e8ecf5;
+    --muted: #8d97ad;
+    --card: rgba(255, 255, 255, 0.05);
+    --borde: rgba(255, 255, 255, 0.1);
+    --a1: #2dd4bf;
+    --a2: #a78bfa;
+    --lienzo: #070a12;
+    --rejilla: #131928;
+    --viva: #2dd4bf;
+    --chipoff: rgba(255, 255, 255, 0.07);
+  }
+}
+
+
+/* ============================================================
+   2. ESTILOS BASE
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  min-height: 100vh;
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Fondo: dos manchas de color y el color base debajo */
+  background:
+    radial-gradient(900px 500px at 10% -10%, color-mix(in srgb, var(--a2) 25%, transparent), transparent),
+    radial-gradient(800px 500px at 100% 0, color-mix(in srgb, var(--a1) 22%, transparent), transparent),
+    var(--bg);
+}
+
+
+/* ============================================================
+   3. CABECERA
+   ============================================================ */
+
+header {
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  letter-spacing: -0.02em;
+}
+
+/* La palabra "vida" con texto en degradado */
+h1 span {
+  background: linear-gradient(90deg, var(--a1), var(--a2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+
+/* ============================================================
+   4. ESTRUCTURA DE LA PÁGINA
+   Dos columnas: la cuadrícula a la izquierda y el panel a la derecha
+   ============================================================ */
+
+.app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 14px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* Panel lateral: las tarjetas van una debajo de otra */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* ============================================================
+   5. TARJETAS
+   ============================================================ */
+
+.card {
+  padding: 14px;
+  background: var(--card);
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+
+/* ============================================================
+   6. ESTADÍSTICAS (generación, población, densidad...)
+   ============================================================ */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.stat {
+  padding: 8px 10px;
+  background: var(--card);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+}
+
+.stat small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stat b {
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;   /* números del mismo ancho */
+}
+
+/* El estado (En marcha, Pausa...) con texto en degradado */
+#estado {
+  background: linear-gradient(90deg, var(--a1), var(--a2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+
+/* ============================================================
+   7. LIENZO (la cuadrícula del juego)
+   ============================================================ */
+
+#wrap {
+  padding: 8px;
+  background: var(--lienzo);
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  box-shadow: 0 0 40px color-mix(in srgb, var(--a1) 18%, transparent);   /* brillo */
+}
+
+canvas {
+  display: block;
+  margin: 0 auto;
+  border-radius: 6px;
+  cursor: crosshair;
+  touch-action: none;   /* evita que el móvil haga scroll al dibujar */
+}
+
+/* Gráfica pequeña de la población */
+#spark {
+  display: block;
+  width: 100%;
+  height: 60px;
+}
+
+
+/* ============================================================
+   8. BOTONES
+   ============================================================ */
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+button,
+select {
+  color: var(--fg);
+  font: inherit;
+}
+
+.btn {
+  padding: 9px 14px;
+  background: var(--chipoff);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--a1);
+}
+
+/* Botón principal (Iniciar / Pausar) */
+.btn.main {
+  min-width: 112px;
+  background: linear-gradient(90deg, var(--a1), var(--a2));
+  border: 0;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   9. FORMULARIOS (select, sliders y casillas)
+   ============================================================ */
+
+select {
+  width: 100%;
+  padding: 8px;
+  background: var(--chipoff);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+select option {
+  color: #14181f;
+}
+
+/* Línea con el nombre del slider a la izquierda y su valor a la derecha */
+label.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0 2px;
+  font-size: 0.85rem;
+}
+
+label.row b {
+  color: var(--a1);
+  font-variant-numeric: tabular-nums;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--a1);
+}
+
+/* Casillas de verificación */
+.checks label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-size: 0.85rem;
+}
+
+.checks input {
+  accent-color: var(--a1);
+}
+
+
+/* ============================================================
+   10. CHIPS (botones pequeños de reglas y patrones)
+   ============================================================ */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 6px 10px;
+  background: var(--chipoff);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* Chip seleccionado */
+.chip.on {
+  background: linear-gradient(90deg, var(--a1), var(--a2));
+  border-color: transparent;
+  color: #ffffff;
+}
+
+/* Chips de números (0 al 8) en las reglas */
+.num {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   11. TEXTOS Y DETALLES
+   ============================================================ */
+
+/* Títulos pequeños dentro de las tarjetas de reglas */
+.gr {
+  margin: 8px 0 4px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+/* Explicación de la regla activa */
+.desc {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+/* Texto de atajos de teclado */
+.hint {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+kbd {
+  padding: 0 5px;
+  background: var(--chipoff);
+  border: 1px solid var(--borde);
+  border-radius: 4px;
+}
+
+
+/* ============================================================
+   12. ADAPTACIÓN A MÓVIL
+   ============================================================ */
+
+/* Pantallas medianas: el panel pasa debajo de la cuadrícula */
+@media (max-width: 920px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Pantallas pequeñas: las estadísticas van en 3 columnas */
+@media (max-width: 560px) {
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Juego de la vida · Laboratorio</title>
+<!-- Enlazamos la hoja de estilos -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>Juego de la <span>vida</span></h1>
+  <p>Laboratorio de autómatas celulares · patrones, reglas y estadísticas</p>
+</header>
+
+<main class="app">
+  <!-- Columna izquierda: estadísticas, cuadrícula y botones -->
+  <section>
+    <div class="stats">
+      <div class="stat"><small>Generación</small><b id="sGen">0</b></div>
+      <div class="stat"><small>Población</small><b id="sPob">0</b></div>
+      <div class="stat"><small>Densidad</small><b id="sDen">0%</b></div>
+      <div class="stat"><small>Pico</small><b id="sPico">0</b></div>
+      <div class="stat"><small>Estado</small><b id="estado">Pausa</b></div>
+    </div>
+    <div id="wrap"><canvas id="lienzo"></canvas></div>
+    <div class="bar">
+      <button class="btn main" id="bPlay">▶ Iniciar</button>
+      <button class="btn" id="bPaso">Paso</button>
+      <button class="btn" id="bAzar">Aleatorio</button>
+      <button class="btn" id="bLimpiar">Limpiar</button>
+    </div>
+    <p class="hint">Atajos: <kbd>Espacio</kbd> iniciar/pausar · <kbd>N</kbd> paso · <kbd>R</kbd> aleatorio · <kbd>C</kbd> limpiar</p>
+  </section>
+
+  <!-- Columna derecha: panel de control -->
+  <aside class="side">
+    <div class="card">
+      <h2>Simulación</h2>
+      <label class="row">Velocidad <b id="vVel">12 gen/s</b></label>
+      <input type="range" id="velocidad" min="1" max="60" value="12">
+      <label class="row">Densidad inicial <b id="vDen">30%</b></label>
+      <input type="range" id="densidad" min="5" max="70" value="30">
+      <label class="row">Tamaño de celda</label>
+      <select id="tamano"><option value="8">Pequeña</option><option value="12" selected>Media</option><option value="18">Grande</option></select>
+    </div>
+
+    <div class="card">
+      <h2>Reglas (notación B/S)</h2>
+      <select id="preset"></select>
+      <div class="gr">Nace (B): vecinos que hacen nacer una célula muerta</div>
+      <div class="chips" id="chipsB"></div>
+      <div class="gr">Sobrevive (S): vecinos con los que una viva sigue viva</div>
+      <div class="chips" id="chipsS"></div>
+      <p class="desc" id="descRegla"></p>
+    </div>
+
+    <div class="card">
+      <h2>Patrones (clic en la cuadrícula para colocar)</h2>
+      <div class="chips" id="patrones"></div>
+    </div>
+
+    <div class="card">
+      <h2>Visualización</h2>
+      <select id="modoColor">
+        <option value="edad">Color por edad</option>
+        <option value="clasico">Un solo color</option>
+        <option value="arcoiris">Arcoíris por posición</option>
+      </select>
+      <div class="checks">
+        <label><input type="checkbox" id="kRastro" checked> Estela de células muertas</label>
+        <label><input type="checkbox" id="kRejilla" checked> Mostrar rejilla</label>
+        <label><input type="checkbox" id="kEnvolver" checked> Bordes que dan la vuelta</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Evolución de la población</h2>
+      <canvas id="spark" width="300" height="60"></canvas>
+    </div>
+  </aside>
+</main>
+
+<!-- El JavaScript va al final para que el HTML ya exista cuando se ejecute -->
+<script src="script.js"></script>
+</body>
+</html>
